@@ -1,9 +1,11 @@
+import requests
 from clickupython import client
 from datetime import datetime, timedelta
 from pytz import timezone
 import calendar
 from create_nl_issues_helpers import create_nl_issues
 from config import config
+from clickup_helpers import update_due_date
 
 
 clickup = client.ClickUpClient(config['API_KEY'])
@@ -29,6 +31,7 @@ def parse_request(request):
 def scheduled_issue_update():
 
     newsletters = clickup.get_tasks(config['NEWSLETTER_LIST_ID'])
+
     for newsletter in newsletters:
 
         create_nl_issues(newsletter)
@@ -38,10 +41,17 @@ def single_issue_creation(type):
     # otherwise just create the first issue
     pass
 
-def change_dates(body):
+def change_dates(request):
     # move dates forward or backwards on the singlue issue
-    pass
+    request_json = request.get_json(silent=True)
+    print(f"Request json: {request_json}")
+    task_id = request_json.get('task_id')
+    days = request_json.get('days')
 
+    task = clickup.get_task(task_id)
+    task_duedate = task.due_date
+
+    return update_due_date(task_id,task_duedate,days)
 
 if __name__ == "__main__":
     class FakeRequest:
@@ -51,3 +61,4 @@ if __name__ == "__main__":
     fake_request = FakeRequest()
 
     parse_request(fake_request)
+

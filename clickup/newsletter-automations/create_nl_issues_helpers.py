@@ -154,8 +154,7 @@ def process_new_issues(most_recent_issue, newsletter):
         # Increment the current issue number
         current_issue_num += 1
         # Construct the new issue name
-        new_issue_name = f"{
-            nl_name} - Y{year_short}.{month_short}.C{cycle_num} - Issue {current_issue_num}"
+        new_issue_name = f"{nl_name} - Y{year_short}.{month_short}.C{cycle_num} - Issue {current_issue_num}"
         # Add the new issue data to the list
         new_issues_data.append({'new_issue_name': new_issue_name,
                                 'new_issue_num': current_issue_num, 'new_due_date': send_date})
