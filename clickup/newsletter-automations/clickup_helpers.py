@@ -16,6 +16,35 @@ def get_full_task(clickup, task_id):
     data = response.json()
     return data
 
+def create_task(clickup,list_id,name,parent_task_id):
+    url = f"https://api.clickup.com/api/v2/list/{list_id}/task"
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": clickup.accesstoken
+    }
+
+    data = {
+      "name": name,
+      "description": "New Task Description",
+      "assignees": [],
+      "tags": [],
+      "status": "Open",
+      "priority": None,
+      "due_date": None,
+      "due_date_time": None,
+      "time_estimate": None,
+      "start_date": None,
+      "start_date_time": None,
+      "notify_all": None,
+      "parent": None,
+      "links_to": parent_task_id,
+      "custom_fields": []
+    }
+
+    res = requests.post(url,headers=headers,json=data)
+    return res.json()
+
 def update_due_date(task_id,task_duedate,days):
 
     # Given timestamp in milliseconds

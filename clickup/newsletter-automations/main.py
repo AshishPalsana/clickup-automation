@@ -5,8 +5,7 @@ from pytz import timezone
 import calendar
 from create_nl_issues_helpers import create_nl_issues
 from config import config
-from clickup_helpers import update_due_date
-
+from clickup_helpers import update_due_date, get_full_task, create_task
 
 clickup = client.ClickUpClient(config['API_KEY'])
 
@@ -36,10 +35,28 @@ def scheduled_issue_update():
 
         create_nl_issues(newsletter)
 
-def single_issue_creation(type):
+def single_issue_creation(request):
     #if type is prototype issue, then do prototype things
     # otherwise just create the first issue
-    pass
+    request_json = request.get_json(silent=True)
+    print(f"Request json: {request_json}")
+    task_id = request_json.get('task_id')
+
+    newsletter = get_full_task(clickup, task_id)
+
+    nl_name = newsletter["name"]
+
+    created_date = datetime.fromtimestamp(int(newsletter["date_created"]) / 1000)
+
+    year_short = created_date.strftime('%y')
+
+    month_short = created_date.strftime('%b').upper()
+
+    nl_issue_name = f"{nl_name} - Y{year_short}.{month_short}.C0 - Issue #0"
+
+    newsletter_issue = create_task(clickup,config["ISSUE_LIST_ID"],nl_issue_name,task_id)
+
+    return newsletter_issue["id"]
 
 def change_dates(request):
     # move dates forward or backwards on the singlue issue
